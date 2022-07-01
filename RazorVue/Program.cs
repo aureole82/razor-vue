@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RazorVue.Data;
@@ -15,7 +14,8 @@ var services = builder.Services;
 builder.Services
     .AddDbContext<EditorDbContext>(options =>
         options
-            .UseSqlServer(builder.Configuration.GetConnectionString("EditorDbContext"))
+            .UseInMemoryDatabase("EditorDb")
+            //.UseSqlServer(builder.Configuration.GetConnectionString("EditorDbContext"))
             .EnableSensitiveDataLogging()
     );
 
@@ -25,7 +25,7 @@ using (var ioc = builder.Services.BuildServiceProvider())
 {
     using var scope = ioc.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<EditorDbContext>();
-    db.Database.Migrate();
+    db.Database.EnsureCreated();
 }
 
 #endregion Configure services.

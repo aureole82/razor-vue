@@ -1,4 +1,5 @@
 ﻿@page
+@using RazorVue.Data.Models
 @model EditModel
 
 @{
@@ -31,7 +32,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Segment.Type" class="control-label"></label>
-                <select asp-for="Segment.Type" class="form-control"></select>
+                <select asp-for="Segment.Type" class="form-control" asp-items="Html.GetEnumSelectList<SegmentType>()"></select>
                 <span asp-validation-for="Segment.Type" class="text-danger"></span>
             </div>
             <div class="form-group">
