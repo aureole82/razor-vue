@@ -12,56 +12,66 @@
 </p>
 <table class="table">
     <thead>
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Segment[0].Start)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Segment[0].Length)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Segment[0].Description)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Segment[0].Type)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Segment[0].Rights)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Segment[0].Material)
-        </th>
-        <th></th>
-    </tr>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Segment[0].Start)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Segment[0].Length)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Segment[0].Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Segment[0].Type)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Segment[0].Rights)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Segment[0].Material)
+            </th>
+            <th></th>
+        </tr>
     </thead>
     <tbody>
-    @foreach (var item in Model.Segment)
-    {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Start)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Length)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Type)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Rights)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Material.Description)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-    }
+        @foreach (var item in Model.Segment)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Start)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Length)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Rights)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Material.Description)
+                </td>
+                <td>
+                    <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+@section Scripts
+    {
+    <environment names="Development">
+        <script type="text/javascript" src="~/lib/vue/dist/vue.global.js"></script>
+    </environment>
+    <environment names="Production">
+        <script type="text/javascript" src="~/lib/vue/dist/vue.global.prod.js"></script>
+    </environment>
+}
