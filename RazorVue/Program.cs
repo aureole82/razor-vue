@@ -50,6 +50,7 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapRazorPages();
+app.MapControllers();
 
 #endregion Configure HTTP request pipeline.
 
