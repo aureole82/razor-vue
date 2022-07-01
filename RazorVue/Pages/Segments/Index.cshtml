@@ -8,41 +8,11 @@
 
 <h1>Index</h1>
 
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
-<div id="app">
-<table class="table">
-    <thead>
-        <tr>
-            <th>Start</th>
-            <th>Length (in seconds)</th>
-            <th>Description</th>
-            <th>Type</th>
-            <th>Rights</th>
-            <th>Material</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-            <tr v-for="segment in segments" :key="segment.id">
-                <td>{{segment.Start}}</td>
-                <td>{{segment.Length}}</td>
-                <td>{{segment.Description}}</td>
-                <td>{{segment.Type}}</td>
-                <td>{{segment.Rights}}</td>
-                <td>{{segment.Material?.Description}}</td>
-                <td>
-                    <a>Edit</a> |
-                    <a>Details</a> |
-                    <a>Delete</a>
-                </td>
-            </tr>
-    </tbody>
-</table></div>
+<p><a asp-page="Create">Create New</a></p>
 
-@section Scripts
-    {
+<div id="app"></div>
+
+@section Scripts {
     <environment names="Development">
         <script type="text/javascript" src="~/lib/vue/dist/vue.global.js"></script>
     </environment>
@@ -50,21 +20,65 @@
         <script type="text/javascript" src="~/lib/vue/dist/vue.global.prod.js"></script>
     </environment>
 
+    <!-- Templates. -->
+    <script type="text/x-template" id="app-template">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Start</th>
+                    <th>Length (in seconds)</th>
+                    <th>Description</th>
+                    <th>Type</th>
+                    <th>Rights</th>
+                    <th>Material</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <segment-list-item v-for="segment in segments" :key="segment.id" :segment="segment"></segment-list-item>
+            </tbody>
+        </table>
+    </script>
+    <script type="text/x-template" id="segment-list-item-template">
+        <tr>
+            <td>{{segment.Start}}</td>
+            <td>{{segment.Length}}</td>
+            <td>{{segment.Description}}</td>
+            <td>{{segment.Type}}</td>
+            <td>{{segment.Rights}}</td>
+            <td>{{segment.Material?.Description}}</td>
+            <td>
+                <a>Edit</a> |
+                <a>Details</a> |
+                <a>Delete</a>
+            </td>
+        </tr>
+    </script>
+    <script type="text/javascript">
+        const SegmentListItem = {
+            template: "#segment-list-item-template",
+            props: ['segment'],
+            data() {
+                return {
+                };
+            }
+        };
+    </script>
+
+    <!-- App. -->
     <script type="text/javascript">
         const { createApp } = Vue;
 
-
         const app = createApp({
+            template: '#app-template',
+            components: {
+                'segment-list-item': SegmentListItem
+            },
             data() {
-
                 return {
-                    message: 'Hello World from Vue.js!',
                     segments: @Html.Raw(JsonSerializer.Serialize(Model.Segments))
-
-                }
-
+                                        }
             }
-
         });
 
         app.mount('#app');
