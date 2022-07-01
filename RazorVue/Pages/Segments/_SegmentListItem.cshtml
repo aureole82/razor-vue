@@ -1,0 +1,26 @@
+﻿<script type="text/x-template" id="segment-list-item-template">
+    <tr>
+        <td>{{segment.start}}</td>
+        <td>{{segment.length}}</td>
+        <td>{{segment.description}}</td>
+        <td>{{segment.type}}</td>
+        <td>{{segment.rights}}</td>
+        <td>{{segment.material?.description}}</td>
+        <td> <button class="btn btn-danger" v-on:click="deleteSegment(segment.id)">Delete</button> </td>
+    </tr>
+</script>
+<script type="text/javascript">
+    const SegmentListItem = {
+        template: "#segment-list-item-template",
+        props: ['segment'],
+        data() {
+            return {
+            };
+        },
+        methods: {
+            deleteSegment: function(id) {
+                this.$emit("segmentDeleted", id);
+            }
+        }
+    };
+</script>

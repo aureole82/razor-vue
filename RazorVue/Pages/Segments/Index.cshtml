@@ -2,25 +2,18 @@
 @model IndexModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewBag.Title = "Segments";
 }
-
-<h1>Index</h1>
+<h1>@ViewBag.Title</h1>
 
 
 <div id="app"></div>
 
 @section Scripts {
-    <partial name="Shared/_ValidationScriptsPartial" />
 
-    <environment names="Development">
-        <script type="text/javascript" src="~/lib/vue/dist/vue.global.js"></script>
-    </environment>
-    <environment names="Production">
-        <script type="text/javascript" src="~/lib/vue/dist/vue.global.prod.js"></script>
-    </environment>
+    <partial name="_SegmentListItem" />
+    <partial name="_SegmentCreate" />
 
-    <!-- Templates. -->
     <script type="text/x-template" id="app-template">
         <p>
             <segment-create v-on:segmentCreated="createSegment($event)"></segment-create>
@@ -42,119 +35,7 @@
                 <segment-list-item v-for="segment in segments" :key="segment.id" :segment="segment" v-on:segmentDeleted="deleteSegment($event)"></segment-list-item>
             </tbody>
         </table>
-
     </script>
-
-    <script type="text/x-template" id="segment-list-item-template">
-        <tr>
-            <td>{{segment.start}}</td>
-            <td>{{segment.length}}</td>
-            <td>{{segment.description}}</td>
-            <td>{{segment.type}}</td>
-            <td>{{segment.rights}}</td>
-            <td>{{segment.material?.description}}</td>
-            <td> <button class="btn btn-danger" v-on:click="deleteSegment(segment.id)">Delete</button> </td>
-        </tr>
-    </script>
-    <script type="text/javascript">
-        const SegmentListItem = {
-            template: "#segment-list-item-template",
-            props: ['segment'],
-            data() {
-                return {
-                };
-            },
-            methods: {
-                deleteSegment: function(id) {
-                    this.$emit("segmentDeleted", id);
-                }
-            }
-        };
-    </script>
-
-    <script type="text/x-template" id="segment-create-template">
-        <form v-on:submit.prevent="createSegment">
-                <div class="form-group">
-                    <label class="control-label" for="Segment_Start">Start</label>
-                    <input v-model="segment.start" class="form-control" type="text" data-val="true" data-val-required="The Start field is required." id="Segment_Start" name="Segment.Start">
-                    <span class="text-danger field-validation-valid" data-valmsg-for="Segment.Start" data-valmsg-replace="true"></span>
-                </div>
-                <div class="form-group">
-                    <label class="control-label" for="Segment_Length">Length</label>
-                    <input v-model="segment.length" class="form-control" type="number" data-val="true" data-val-required="The Length field is required." id="Segment_Length" name="Segment.Length">
-                    <span class="text-danger field-validation-valid" data-valmsg-for="Segment.Length" data-valmsg-replace="true"></span>
-                </div>
-                <div class="form-group">
-                    <label class="control-label" for="Segment_Description">Description</label>
-                    <input v-model="segment.description" class="form-control" type="text" data-val="true" data-val-required="The Description field is required." id="Segment_Description" name="Segment.Description">
-                    <span class="text-danger field-validation-valid" data-valmsg-for="Segment.Description" data-valmsg-replace="true"></span>
-                </div>
-                <div class="form-group">
-                    <label class="control-label" for="Segment_Type">Type</label>
-                    <select v-model="segment.type" class="form-control" data-val="true" data-val-required="The Type field is required." id="Segment_Type" name="Segment.Type">
-                        <option value="0">New</option>
-                        <option value="1">Archive</option>
-                        <option value="2">Raw</option>
-                        <option value="3">Image</option>
-                        <option value="4">Music</option>
-                        <option value="5">Video</option>
-                    </select>
-                    <span class="text-danger field-validation-valid" data-valmsg-for="Segment.Type" data-valmsg-replace="true"></span>
-                </div>
-                <div class="form-group">
-                    <label class="control-label" for="Segment_Rights">Rights</label>
-                    <input v-model="segment.rights" class="form-control" type="text" id="Segment_Rights" name="Segment.Rights">
-                    <span class="text-danger field-validation-valid" data-valmsg-for="Segment.Rights" data-valmsg-replace="true"></span>
-                </div>
-                <div class="form-group">
-                    <label class="control-label" for="Segment_MaterialId">MaterialId</label>
-                    <select v-model="segment.materialId" class="form-control" id="Segment_MaterialId" name="Segment.MaterialId"><option value="1">First steps of Mountain Mike</option>
-                        <option value="2">Mountain Mike is hiking</option>
-                        <option value="3">Hiking is a new movement</option>
-                        <option value="4">Mountain Mike takes a rest</option>
-                        <option value="5">Local mountain tours for intermediates</option>
-                        <option value="7">Say goodbye to Mountain Mike</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <input type="submit" value="Create" class="btn btn-primary">
-                </div>
-            </form>
-    </script>
-    <script type="text/javascript">
-        const SegmentCreate = {
-            template: "#segment-create-template",
-            data() {
-                return {
-                    segment: {
-                        start: "00:01:28",
-                        length: 25,
-                        description: "New segment",
-                        rights: "w/o",
-                        type: 1,
-                        materialId: 7
-                    }
-                };
-            },
-            methods: {
-                createSegment() {
-                    this.$emit(
-                        "segmentCreated",
-                        {
-                            start: this.segment.start,
-                            length: this.segment.length,
-                            description: this.segment.description,
-                            rights: this.segment.rights,
-                            type: this.segment.type,
-                            materialId: this.segment.materialId
-                        }
-                    );
-                }
-            }
-        };
-    </script>
-
-    <!-- App. -->
     <script type="text/javascript">
         const { createApp } = Vue;
 
