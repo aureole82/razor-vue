@@ -53,7 +53,7 @@
             <td>{{segment.type}}</td>
             <td>{{segment.rights}}</td>
             <td>{{segment.material?.description}}</td>
-            <td> <button class="btn btn-danger" v-on:click="delete(segment.id)">Delete</button> </td>
+            <td> <button class="btn btn-danger" v-on:click="deleteSegment(segment.id)">Delete</button> </td>
         </tr>
     </script>
     <script type="text/javascript">
@@ -65,19 +65,15 @@
                 };
             },
             methods: {
-                delete: function(id) {
-                    console.log(id);
-                    this.$emit(
-                        "segmentDeleted",
-                        id
-                    );
+                deleteSegment: function(id) {
+                    this.$emit("segmentDeleted", id);
                 }
             }
         };
     </script>
 
     <script type="text/x-template" id="segment-create-template">
-        <form v-on:submit.prevent="create">
+        <form v-on:submit.prevent="createSegment">
                 <div class="form-group">
                     <label class="control-label" for="Segment_Start">Start</label>
                     <input v-model="segment.start" class="form-control" type="text" data-val="true" data-val-required="The Start field is required." id="Segment_Start" name="Segment.Start">
@@ -141,7 +137,7 @@
                 };
             },
             methods: {
-                create() {
+                createSegment() {
                     this.$emit(
                         "segmentCreated",
                         {
@@ -205,7 +201,7 @@
                             method: "delete"
                         }
                     );
-                    if (response.statusCode === 200) {
+                    if (response.status === 204) {
                         this.segments = this.segments.filter(segment => segment.id !== id);
                     }
                 }
