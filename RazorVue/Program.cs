@@ -19,7 +19,13 @@ builder.Services
             .EnableSensitiveDataLogging()
     );
 
+services.AddControllers();
 services.AddRazorPages();
+
+services.AddSwaggerGen();
+
+#endregion Configure services.
+
 
 using (var ioc = builder.Services.BuildServiceProvider())
 {
@@ -28,7 +34,6 @@ using (var ioc = builder.Services.BuildServiceProvider())
     db.Database.EnsureCreated();
 }
 
-#endregion Configure services.
 
 #region Configure HTTP request pipeline.
 
@@ -41,6 +46,9 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.UseSwagger();
+app.UseSwaggerUI(options => { options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1"); });
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
