@@ -17,11 +17,11 @@ public class IndexModel : PageModel
         _context = context;
     }
 
-    public IList<Segment> Segment { get; set; } = default!;
+    public IList<Segment> Segments { get; set; } = default!;
 
     public async Task OnGetAsync()
     {
-        Segment = await _context.Segments
+        Segments = await _context.Segments
             .OrderBy(segment => segment.Start)
             .Include(s => s.Material).ToListAsync();
     }
