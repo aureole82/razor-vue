@@ -21,6 +21,13 @@ builder.Services
 
 services.AddRazorPages();
 
+using (var ioc = builder.Services.BuildServiceProvider())
+{
+    using var scope = ioc.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<EditorDbContext>();
+    db.Database.Migrate();
+}
+
 #endregion Configure services.
 
 #region Configure HTTP request pipeline.
