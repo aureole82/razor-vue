@@ -2,14 +2,11 @@
 @model IndexModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewBag.Title = "Your lists";
 }
 
-<h1>Index</h1>
+<h1>@ViewBag.Title</h1>
 
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
     <tr>

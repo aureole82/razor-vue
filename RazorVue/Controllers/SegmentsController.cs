@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RazorVue.Data;
@@ -14,19 +14,26 @@ namespace RazorVue.Controllers;
 public class SegmentsController : ControllerBase
 {
     private readonly EditorDbContext _db;
+    private readonly IMapper _mapper;
 
-    public SegmentsController(EditorDbContext db)
+    public SegmentsController(EditorDbContext db, IMapper mapper)
     {
         _db = db;
+        _mapper = mapper;
     }
 
     // GET: api/Segments/5
     [HttpGet("{id}")]
     public async Task<ActionResult<Segment>> GetSegment(int id)
     {
-        var segment = await _db.Segments.FindAsync(id);
+        var segment = await _db.Segments
+                .AsNoTracking()
+                .Where(segment => segment.Id == id)
+                .ProjectTo<SegmentResponse>(_mapper.ConfigurationProvider)
+                .SingleOrDefaultAsync()
+            ;
 
-        return segment == null ? NotFound() : segment;
+        return segment == null ? NotFound() : Ok(segment);
     }
 
     // PUT: api/Segments/5

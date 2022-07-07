@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using RazorVue.Controllers;
 using RazorVue.Data;
+using RazorVue.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,13 +12,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 var services = builder.Services;
 
-builder.Services
-    .AddDbContext<EditorDbContext>(options =>
-        options
-            .UseInMemoryDatabase("EditorDb")
-            //.UseSqlServer(builder.Configuration.GetConnectionString("EditorDbContext"))
-            .EnableSensitiveDataLogging()
-    );
+services
+    .AddData()
+    .AddApi()
+    ;
 
 services.AddControllers();
 services.AddRazorPages();
