@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,13 +18,6 @@ public class SegmentsController : ControllerBase
     public SegmentsController(EditorDbContext db)
     {
         _db = db;
-    }
-
-    // GET: api/Segments
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Segment>>> GetSegments()
-    {
-        return await _db.Segments.ToListAsync();
     }
 
     // GET: api/Segments/5

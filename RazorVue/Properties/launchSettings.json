@@ -11,7 +11,7 @@
     "RazorVue": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "Segments",
+      "launchUrl": "Segments/1",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

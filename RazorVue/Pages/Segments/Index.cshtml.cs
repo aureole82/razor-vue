@@ -17,12 +17,7 @@ public class IndexModel : PageModel
         _context = context;
     }
 
-    public IList<Segment> Segments { get; set; } = default!;
-
-    public async Task OnGetAsync()
+    public void OnGet(int listId)
     {
-        Segments = await _context.Segments
-            .OrderBy(segment => segment.Start)
-            .Include(s => s.Material).ToListAsync();
     }
 }

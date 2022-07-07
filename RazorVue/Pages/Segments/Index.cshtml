@@ -1,8 +1,8 @@
-﻿@page
+﻿@page "{listId:int}"
 @model IndexModel
 
 @{
-    ViewBag.Title = "Segments";
+    ViewBag.Title = $"Segments of list#{RouteData.Values["listId"]}";
 }
 <h1>@ViewBag.Title</h1>
 
@@ -11,8 +11,8 @@
 
 @section Scripts {
 
-    <partial name="_SegmentListItem" />
-    <partial name="_SegmentCreate" />
+    <partial name="_SegmentListItem"/>
+    <partial name="_SegmentCreate"/>
 
     <script type="text/x-template" id="app-template">
         <p>
@@ -37,6 +37,7 @@
         </table>
     </script>
     <script type="text/javascript">
+        const url = '@Url.ActionLink("GetSegments", "Lists", new { id = RouteData.Values["listId"] })';
         const { createApp } = Vue;
 
         const app = createApp({
@@ -52,7 +53,7 @@
             },
             async mounted() {
                 try {
-                    const response = await fetch('/api/Segments');
+                    const response = await fetch(url);
                     const data = await response.json();
                     this.segments = data;
                 } catch (error) {
