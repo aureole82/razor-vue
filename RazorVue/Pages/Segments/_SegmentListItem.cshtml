@@ -6,7 +6,7 @@
         <td>{{segment.type}}</td>
         <td>{{segment.rights}}</td>
         <td>{{segment.material?.description}}</td>
-        <td> <button class="btn btn-danger" v-on:click="deleteSegment(segment.id)">Delete</button> </td>
+        <td> <button class="btn btn-danger" v-on:click="deleteSegment(segment.id)" aria-label="Delete segment"><i class="fa-solid fa-trash"></i></button> </td>
     </tr>
 </script>
 <script type="text/javascript">
