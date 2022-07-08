@@ -35,6 +35,8 @@
                 </table>
             </div>
             <div class="col-md-3 col-12">
+                <input type="range" min="0" :max="getTotalLength()" :value="currentPosition" class="slider w-100">
+                <div class="row"><div class="col">0</div><div class="col text-center">{{currentPosition}}</div><div class="col text-end">{{getTotalLength()}}</div></div>
                 <segment-edit v-on:segmentEdited="editSegment($event)" :segment="currentSegment"></segment-edit>
             </div>
         </div>
@@ -46,6 +48,10 @@
     <script type="text/javascript">
         const url = '@Url.ActionLink("GetSegments", "Lists", new { id = RouteData.Values["listId"] })';
         const { createApp } = Vue;
+        function getSeconds(start, length) {
+            const timestamp = new Date('1970-01-01T' + start);
+            return (timestamp.getHours() * 60 + timestamp.getMinutes()) * 60 + timestamp.getSeconds() + (length ?? 0);
+        }
 
         const app = createApp({
             template: '#app-template',
@@ -54,23 +60,50 @@
                 'segment-edit': SegmentEdit,
                 'segment-list-item': SegmentListItem
             },
+            computed: {
+                currentPosition() {
+                    if (!this.currentSegment) return 0;
+
+                    return getSeconds(this.currentSegment.start);
+                },
+                currentSegment() {
+                    if (!this.segments.length) return undefined;
+
+                    return this.segments[this.currentIndex];
+                }
+            },
             data() {
                 return {
-                    currentSegment: {},
-                    segments: []
+                    currentIndex: 0,
+                    segments: [],
+                    totalLength: 0
                 };
             },
-            async mounted() {
+
+            watch: {
+                currentPosition(changed, old) {
+                    console.log("currentPosition", old, changed);
+                }
+            },
+            mounted() {
                 try {
-                    const response = await fetch(url);
-                    const data = await response.json();
-                    this.segments = data;
-                    this.currentSegment = this.segments[1];
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                            this.segments = data;
+                            this.currentIndex = 1;
+                        });
                 } catch (error) {
                     console.log(error);
                 }
             },
             methods: {
+                getTotalLength() {
+                    if (!this.segments.length) return 0;
+
+                    const lastSegment = this.segments[this.segments.length - 1];
+                    return getSeconds(lastSegment.start, lastSegment.length);
+                },
                 async createSegment(segment) {
                     const response = await fetch(
                         "/api/Segments",
