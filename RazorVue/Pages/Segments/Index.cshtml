@@ -40,14 +40,14 @@
                 </table>
             </div>
             <div class="col-md-3 col-12">
-                <input type="range" class="w-100" ref="positionSlider"
+                <input type="range" class="w-100"
                        min="0"
                        :max="totalLength"
-                       :value="startPosition"
+                       :value="currentPosition"
                        @@input="currentPositionChanged($event.target.value)">
                 <div class="row">
                     <div class="col">0</div>
-                    <div class="col text-center">{{startPosition}}|{{currentPosition}}</div>
+                    <div class="col text-center">{{currentPosition}}</div>
                     <div class="col text-end">{{totalLength}}</div>
                 </div>
                 <hr/>
@@ -76,11 +76,6 @@
                 'segment-list-item': SegmentListItem
             },
             computed: {
-                startPosition() {
-                    if (!this.currentSegment) return 0;
-
-                    return getSeconds(this.currentSegment.start);
-                },
                 currentSegment() {
                     if (!this.segments.length) return undefined;
 
@@ -111,18 +106,18 @@
             methods: {
                 currentPositionChanged(position) {
                     this.currentPosition = position;
-                    return;
-                    //let lastIndex = 0;
-                    //for (let index = 0; index < this.segments.length; index++) {
-                    //    const start = getSeconds(this.segments[index].start);
-                    //    if (position < start) break;
+                    //return;
+                    let lastIndex = 0;
+                    for (let index = 0; index < this.segments.length; index++) {
+                        const start = getSeconds(this.segments[index].start);
+                        if (position < start) break;
 
-                    //    lastIndex = index;
-                    //}
-                    //console.log("currentPositionChanged()", position, lastIndex);
-                    //if (this.currentIndex === lastIndex) return;
+                        lastIndex = index;
+                    }
+                    console.log("currentPositionChanged()", position, lastIndex);
+                    if (this.currentIndex === lastIndex) return;
 
-                    //this.currentIndex = lastIndex;
+                    this.currentIndex = lastIndex;
                 },
                 async createSegment(segment) {
                     const response = await fetch(
@@ -153,6 +148,7 @@
                 selectSegment(id) {
                     const segment = this.segments.find(segment => segment.id === id);
                     this.currentIndex = this.segments.indexOf(segment);
+                    this.currentPosition = getSeconds(segment.start);
                 },
                 async deleteSegment(id) {
                     const response = await fetch(
