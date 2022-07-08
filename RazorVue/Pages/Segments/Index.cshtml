@@ -14,30 +14,34 @@
     <partial name="_SegmentCreate" />
     <partial name="_SegmentEdit" />
 
-    <script type="text/x-template" id="app-template">
+    <script type="text/html" id="app-template">
         <div class="row">
             <div class="col-md-9 col-12">
-                <table class="table">
+                <table class="table table-hover">
                     <thead>
-                        <tr>
-                            <th>Start</th>
-                            <th>Length (in seconds)</th>
-                            <th>Description</th>
-                            <th>Type</th>
-                            <th>Rights</th>
-                            <th>Material</th>
-                            <th></th>
-                        </tr>
+                    <tr>
+                        <th>Start</th>
+                        <th>Length (in seconds)</th>
+                        <th>Description</th>
+                        <th>Type</th>
+                        <th>Rights</th>
+                        <th>Material</th>
+                        <th></th>
+                    </tr>
                     </thead>
                     <tbody>
-                        <segment-list-item v-for="segment in segments" :key="segment.id" :segment="segment" v-on:segmentDeleted="deleteSegment($event)"></segment-list-item>
+                    <segment-list-item v-for="segment in segments" :key="segment.id"
+                               :segment="segment"
+                               v-on:segmentDeleted="deleteSegment($event)"
+                               v-on:segmentSelected="selectSegment($event)"
+                               :isSelected="currentSegment.id===segment.id"></segment-list-item>
                     </tbody>
                 </table>
             </div>
             <div class="col-md-3 col-12">
-                <input type="range" min="0" :max="getTotalLength()" :value="currentPosition" class="slider w-100">
-                <div class="row"><div class="col">0</div><div class="col text-center">{{currentPosition}}</div><div class="col text-end">{{getTotalLength()}}</div></div>
-                <segment-edit v-on:segmentEdited="editSegment($event)" :segment="currentSegment"></segment-edit>
+                <input type="range" min="0" :max="totalLength" :value="currentPosition" class="slider w-100">
+                <div class="row"><div class="col">0</div><div class="col text-center">{{currentPosition}}</div><div class="col text-end">{{totalLength}}</div></div>
+                <segment-edit v-if="currentSegment" :segment="currentSegment" v-on:segmentEdited="editSegment($event)"></segment-edit>
             </div>
         </div>
         <hr />
@@ -79,12 +83,6 @@
                     totalLength: 0
                 };
             },
-
-            watch: {
-                currentPosition(changed, old) {
-                    console.log("currentPosition", old, changed);
-                }
-            },
             mounted() {
                 try {
                     fetch(url)
@@ -92,18 +90,14 @@
                         .then(data => {
                             this.segments = data;
                             this.currentIndex = 1;
+                            const lastSegment = this.segments.at(-1);
+                            this.totalLength = getSeconds(lastSegment.start, lastSegment.length);
                         });
                 } catch (error) {
                     console.log(error);
                 }
             },
             methods: {
-                getTotalLength() {
-                    if (!this.segments.length) return 0;
-
-                    const lastSegment = this.segments[this.segments.length - 1];
-                    return getSeconds(lastSegment.start, lastSegment.length);
-                },
                 async createSegment(segment) {
                     const response = await fetch(
                         "/api/Segments",
@@ -116,7 +110,6 @@
                         }
                     );
                     const stored = await response.json();
-                    console.log(stored);
                     this.segments.push(stored);
                 },
                 async editSegment(segment) {
@@ -130,8 +123,10 @@
                             body: JSON.stringify(segment)
                         }
                     );
-                    const stored = await response.json();
-                    console.log(stored);
+                },
+                selectSegment(id) {
+                    const segment = this.segments.find(segment => segment.id === id);
+                    this.currentIndex = this.segments.indexOf(segment);
                 },
                 async deleteSegment(id) {
                     const response = await fetch(

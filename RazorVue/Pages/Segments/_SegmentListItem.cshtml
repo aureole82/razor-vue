@@ -1,30 +1,32 @@
 ﻿<script type="text/html" id="segment-list-item-template">
-    <tr class="">
-        <td :height="minHeight">{{segment.start}}</td>
+    <tr :class="{'fw-bold':isSelected}">
+        <td :height="minHeight" style="cursor: pointer;" v-on:click="selectSegment()">{{segment.start}}</td>
         <td>{{segment.length}}</td>
         <td>{{segment.description}}</td>
         <td>{{segment.type}}</td>
         <td>{{segment.rights}}</td>
         <td>{{segment.material?.description}}</td>
-        <td> <button class="btn btn-danger" v-on:click="deleteSegment(segment.id)" aria-label="Delete segment"><i class="fa-solid fa-trash"></i></button> </td>
+        <td> <button class="btn btn-danger" v-on:click.prevent="deleteSegment()" aria-label="Delete segment"><i class="fa-solid fa-trash"></i></button> </td>
     </tr>
 </script>
 <script type="text/javascript">
     const SegmentListItem = {
         template: "#segment-list-item-template",
-        props: ['segment'],
+        props: ['segment', 'isSelected'],
         computed: {
             minHeight() {
                 return Math.min(150, Math.max(50, this.segment.length * 5));
             }
         },
         data() {
-            return {
-            };
+            return {};
         },
         methods: {
-            deleteSegment: function(id) {
-                this.$emit("segmentDeleted", id);
+            selectSegment() {
+                this.$emit("segmentSelected", this.segment.id);
+            },
+            deleteSegment() {
+                this.$emit("segmentDeleted", this.segment.id);
             }
         }
     };
