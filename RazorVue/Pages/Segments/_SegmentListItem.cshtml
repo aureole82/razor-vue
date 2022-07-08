@@ -1,6 +1,6 @@
 ﻿<script type="text/x-template" id="segment-list-item-template">
     <tr>
-        <td>{{segment.start}}</td>
+        <td :height="minHeight">{{segment.start}}</td>
         <td>{{segment.length}}</td>
         <td>{{segment.description}}</td>
         <td>{{segment.type}}</td>
@@ -16,6 +16,11 @@
         data() {
             return {
             };
+        },
+        computed: {
+            minHeight() {
+                return Math.min(150, Math.max(50, this.segment.length * 5));
+            }
         },
         methods: {
             deleteSegment: function(id) {
