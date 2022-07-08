@@ -10,9 +10,9 @@
 
 @section Scripts {
 
-    <partial name="_SegmentListItem" />
-    <partial name="_SegmentCreate" />
-    <partial name="_SegmentEdit" />
+    <partial name="_SegmentListItem"/>
+    <partial name="_SegmentCreate"/>
+    <partial name="_SegmentEdit"/>
 
     <script type="text/html" id="app-template">
         <div class="row">
@@ -31,20 +31,30 @@
                     </thead>
                     <tbody>
                     <segment-list-item v-for="segment in segments" :key="segment.id"
-                               :segment="segment"
-                               v-on:segmentDeleted="deleteSegment($event)"
-                               v-on:segmentSelected="selectSegment($event)"
-                               :isSelected="currentSegment.id===segment.id"></segment-list-item>
+                                       :segment="segment"
+                                       v-on:segmentDeleted="deleteSegment($event)"
+                                       v-on:segmentSelected="selectSegment($event)"
+                                       :isSelected="currentSegment.id===segment.id">
+                    </segment-list-item>
                     </tbody>
                 </table>
             </div>
             <div class="col-md-3 col-12">
-                <input type="range" min="0" :max="totalLength" :value="currentPosition" class="slider w-100">
-                <div class="row"><div class="col">0</div><div class="col text-center">{{currentPosition}}</div><div class="col text-end">{{totalLength}}</div></div>
+                <input type="range" class="w-100" ref="positionSlider"
+                       min="0"
+                       :max="totalLength"
+                       :value="startPosition"
+                       @@input="currentPositionChanged($event.target.value)">
+                <div class="row">
+                    <div class="col">0</div>
+                    <div class="col text-center">{{startPosition}}|{{currentPosition}}</div>
+                    <div class="col text-end">{{totalLength}}</div>
+                </div>
+                <hr/>
                 <segment-edit v-if="currentSegment" :segment="currentSegment" v-on:segmentEdited="editSegment($event)"></segment-edit>
             </div>
         </div>
-        <hr />
+        <hr/>
         <p>
             <segment-create v-on:segmentCreated="createSegment($event)"></segment-create>
         </p>
@@ -52,8 +62,9 @@
     <script type="text/javascript">
         const url = '@Url.ActionLink("GetSegments", "Lists", new { id = RouteData.Values["listId"] })';
         const { createApp } = Vue;
+
         function getSeconds(start, length) {
-            const timestamp = new Date('1970-01-01T' + start);
+            const timestamp = new Date(`1970-01-01T${start}`);
             return (timestamp.getHours() * 60 + timestamp.getMinutes()) * 60 + timestamp.getSeconds() + (length ?? 0);
         }
 
@@ -65,7 +76,7 @@
                 'segment-list-item': SegmentListItem
             },
             computed: {
-                currentPosition() {
+                startPosition() {
                     if (!this.currentSegment) return 0;
 
                     return getSeconds(this.currentSegment.start);
@@ -79,6 +90,7 @@
             data() {
                 return {
                     currentIndex: 0,
+                    currentPosition: 0,
                     segments: [],
                     totalLength: 0
                 };
@@ -89,7 +101,6 @@
                         .then(response => response.json())
                         .then(data => {
                             this.segments = data;
-                            this.currentIndex = 1;
                             const lastSegment = this.segments.at(-1);
                             this.totalLength = getSeconds(lastSegment.start, lastSegment.length);
                         });
@@ -98,6 +109,21 @@
                 }
             },
             methods: {
+                currentPositionChanged(position) {
+                    this.currentPosition = position;
+                    return;
+                    //let lastIndex = 0;
+                    //for (let index = 0; index < this.segments.length; index++) {
+                    //    const start = getSeconds(this.segments[index].start);
+                    //    if (position < start) break;
+
+                    //    lastIndex = index;
+                    //}
+                    //console.log("currentPositionChanged()", position, lastIndex);
+                    //if (this.currentIndex === lastIndex) return;
+
+                    //this.currentIndex = lastIndex;
+                },
                 async createSegment(segment) {
                     const response = await fetch(
                         "/api/Segments",
