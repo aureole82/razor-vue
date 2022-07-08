@@ -25,5 +25,9 @@ public static class ApiModule
         config
             .CreateMap<Material, MaterialResponse>()
             ;
+
+        config
+            .CreateMap<SegmentRequest, Segment>()
+            ;
     }
 }

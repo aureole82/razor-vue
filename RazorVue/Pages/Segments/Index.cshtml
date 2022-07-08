@@ -51,7 +51,7 @@
                     <div class="col text-end">{{totalLength}}</div>
                 </div>
                 <hr/>
-                <segment-edit v-if="currentSegment" :segment="currentSegment" v-on:segmentEdited="editSegment($event)"></segment-edit>
+                <segment-edit v-if="currentSegment" :segment="{...currentSegment}" v-on:segmentEdited="editSegment($event)"></segment-edit>
             </div>
         </div>
         <hr/>
@@ -95,6 +95,7 @@
                     fetch(url)
                         .then(response => response.json())
                         .then(data => {
+                            data.forEach(segment => segment.material = segment.material ?? { id: -1 });
                             this.segments = data;
                             const lastSegment = this.segments.at(-1);
                             this.totalLength = getSeconds(lastSegment.start, lastSegment.length);
@@ -134,8 +135,9 @@
                     this.segments.push(stored);
                 },
                 async editSegment(segment) {
+                    segment.materialId = segment.materialId < 0 ? null : segment.materialId;
                     const response = await fetch(
-                        "/api/Segments",
+                        `/api/Segments/${segment.id}`,
                         {
                             method: "put",
                             headers: {
@@ -144,6 +146,13 @@
                             body: JSON.stringify(segment)
                         }
                     );
+                    if (response.status === 200) {
+                        const old = this.segments.find(current => current.id === segment.id);
+                        const currentIndex = this.segments.indexOf(old);
+                        const stored = await response.json();
+                        stored.material = stored.material ?? { id: -1 };
+                        this.segments[currentIndex] = stored;
+                    }
                 },
                 selectSegment(id) {
                     const segment = this.segments.find(segment => segment.id === id);
@@ -166,4 +175,9 @@
 
         app.mount('#app');
     </script>
+
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

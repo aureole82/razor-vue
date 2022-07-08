@@ -38,17 +38,28 @@ public class SegmentsController : ControllerBase
 
     // PUT: api/Segments/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutSegment(int id, Segment segment)
+    public async Task<ActionResult<SegmentResponse>> PutSegment(int id, SegmentRequest request)
     {
-        if (id != default)
+        if (id == default)
         {
             return BadRequest();
         }
 
-        _db.Update(segment);
+        var stored = await _db.Segments.FindAsync(id);
+        if (stored == null)
+        {
+            NotFound();
+        }
+
+        _mapper.Map(request, stored);
         await _db.SaveChangesAsync();
 
-        return NoContent();
+        if (stored.MaterialId != default)
+        {
+            stored.Material = await _db.Materials.FindAsync(stored.MaterialId);
+        }
+
+        return Ok(_mapper.Map<SegmentResponse>(stored));
     }
 
     // POST: api/Segments
