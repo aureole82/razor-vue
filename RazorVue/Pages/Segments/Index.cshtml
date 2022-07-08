@@ -6,35 +6,44 @@
 }
 <h1>@ViewBag.Title</h1>
 
-
 <div id="app"></div>
 
 @section Scripts {
 
-    <partial name="_SegmentListItem"/>
-    <partial name="_SegmentCreate"/>
+    <partial name="_SegmentListItem" />
+    <partial name="_SegmentCreate" />
+    <partial name="_SegmentEdit" />
 
     <script type="text/x-template" id="app-template">
-        <p>
-            <segment-create v-on:segmentCreated="createSegment($event)"></segment-create>
-        </p>
-        <hr />
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Start</th>
-                    <th>Length (in seconds)</th>
-                    <th>Description</th>
-                    <th>Type</th>
-                    <th>Rights</th>
-                    <th>Material</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <segment-list-item v-for="segment in segments" :key="segment.id" :segment="segment" v-on:segmentDeleted="deleteSegment($event)"></segment-list-item>
-            </tbody>
-        </table>
+        <div class="container">
+            <div class="row">
+                <div class="col-9">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Start</th>
+                                <th>Length (in seconds)</th>
+                                <th>Description</th>
+                                <th>Type</th>
+                                <th>Rights</th>
+                                <th>Material</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <segment-list-item v-for="segment in segments" :key="segment.id" :segment="segment" v-on:segmentDeleted="deleteSegment($event)"></segment-list-item>
+                        </tbody>
+                    </table>
+                    <hr />
+                    <p>
+                        <segment-create v-on:segmentCreated="createSegment($event)"></segment-create>
+                    </p>
+                </div>
+                <div class="col-3">
+                    <segment-edit v-on:segmentEdited="editSegment($event)" :segment="currentSegment"></segment-edit>
+                </div>
+            </div>
+        </div>
     </script>
     <script type="text/javascript">
         const url = '@Url.ActionLink("GetSegments", "Lists", new { id = RouteData.Values["listId"] })';
@@ -44,10 +53,12 @@
             template: '#app-template',
             components: {
                 'segment-create': SegmentCreate,
+                'segment-edit': SegmentEdit,
                 'segment-list-item': SegmentListItem
             },
             data() {
                 return {
+                    currentSegment: {},
                     segments: []
                 };
             },
@@ -56,6 +67,7 @@
                     const response = await fetch(url);
                     const data = await response.json();
                     this.segments = data;
+                    this.currentSegment = this.segments[0];
                 } catch (error) {
                     console.log(error);
                 }
@@ -75,6 +87,20 @@
                     const stored = await response.json();
                     console.log(stored);
                     this.segments.push(stored);
+                },
+                async editSegment(segment) {
+                    const response = await fetch(
+                        "/api/Segments",
+                        {
+                            method: "put",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(segment)
+                        }
+                    );
+                    const stored = await response.json();
+                    console.log(stored);
                 },
                 async deleteSegment(id) {
                     const response = await fetch(
