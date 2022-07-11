@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -25,14 +24,24 @@ public class ListsController : ControllerBase
 
     // GET: api/Lists/5/segments
     [HttpGet("{id:int}/segments")]
-    public async Task<ActionResult<IEnumerable<SegmentResponse>>> GetSegments([Required] int id)
+    public async Task<ActionResult<ListResponse>> GetSegments([Required] int id)
     {
-        return await _db.Segments
+        var list = await _db.Lists
                 .AsNoTracking()
-                .Where(segment => segment.ListId == id)
-                .OrderBy(segment => segment.Start)
-                .ProjectTo<SegmentResponse>(_mapper.ConfigurationProvider)
-                .ToListAsync()
+                .Where(list => list.Id == id)
+                .ProjectTo<ListResponse>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync()
             ;
+        if (list == default)
+        {
+            return NotFound();
+        }
+
+        list.Segments = list.Segments
+                .OrderBy(segment => segment.Start)
+                .ToList()
+            ;
+
+        return list;
     }
 }

@@ -54,31 +54,15 @@ public class SegmentsController : ControllerBase
         _mapper.Map(request, stored);
         await _db.SaveChangesAsync();
 
-        if (stored.MaterialId != default)
+        if (stored.MaterialId.HasValue)
         {
-            stored.Material = await _db.Materials.FindAsync(stored.MaterialId);
+            await _db.Entry(stored)
+                    .Reference(segment => segment.Material)
+                    .LoadAsync()
+                ;
         }
 
-        return Ok(_mapper.Map<SegmentResponse>(stored));
-    }
-
-    // POST: api/Segments
-    [HttpPost]
-    public async Task<ActionResult<Segment>> PostSegment(Segment segment)
-    {
-        await _db.Segments.AddAsync(segment);
-        await _db.SaveChangesAsync();
-
-        return CreatedAtAction("GetSegment", new { id = segment.Id }, segment);
-    }
-
-    // DELETE: api/Segments/5
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteSegment(int id)
-    {
-        _db.Segments.Remove(new Segment { Id = id });
-        await _db.SaveChangesAsync();
-
-        return NoContent();
+        var response = _mapper.Map<SegmentResponse>(stored);
+        return Ok(response);
     }
 }

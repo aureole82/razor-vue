@@ -1,17 +1,14 @@
 ﻿<script type="text/html" id="segment-list-item-template">
-    <tr :class="{'fw-bold':isSelected}">
-        <td :height="minHeight" style="cursor: pointer;" v-on:click="selectSegment()">{{segment.start}}</td>
-        <td>{{segment.length}}</td>
-        <td>{{segment.description}}</td>
-        <td>{{getSegmentTypeLabel(segment.type)}}</td>
-        <td>{{segment.rights}}</td>
-        <td>{{segment.material?.description}}</td>
-        <td>
-            <button class="btn btn-danger" v-on:click.prevent="deleteSegment()" aria-label="Delete segment">
-                <i class="fa-solid fa-trash"></i>
-            </button>
-        </td>
-    </tr>
+    <li class="list-group-item" :class="{'active':isSelected}" style="cursor: pointer;" :style="{'min-height':minHeight + 'px'}" v-on:click="selectSegment()">
+        <div class="row">
+            <div class="col-auto">{{segment.start}}<br/>{{segment.length}}s</div>
+            <div class="col text-truncate">
+                <div class="fw-bold text-truncate"><i class="fa-solid" :class="getSegmentTypeIcon(segment.type)" :title="getSegmentTypeLabel(segment.type)"></i> {{segment.description}}</div>
+                <div v-if="segment.rights" class="text-truncate">&copy; {{segment.rights}}</div>
+                <div v-if="segment.materialDescription" class="badge bg-dark d-block text-truncate">{{segment.materialDescription}}</div>
+            </div>
+        </div>
+    </li>
 </script>
 <script type="text/javascript">
     const SegmentListItem = {
@@ -29,8 +26,23 @@
             selectSegment() {
                 this.$emit("segmentSelected", this.segment.id);
             },
-            deleteSegment() {
-                this.$emit("segmentDeleted", this.segment.id);
+            getSegmentTypeIcon(value) {
+                switch (value) {
+                case 0:
+                    return "fa-video";
+                case 1:
+                    return "fa-recycle";
+                case 2:
+                    return "fa-xmarks-lines";
+                case 3:
+                    return "fa-image";
+                case 4:
+                    return "fa-music";
+                case 5:
+                    return "fa-youtube";
+                default:
+                    return "fa-circle-question";
+                }
             },
             getSegmentTypeLabel(value) {
                 switch (value) {

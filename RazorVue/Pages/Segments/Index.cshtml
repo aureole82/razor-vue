@@ -4,86 +4,86 @@
 @{
     ViewBag.Title = $"Segments of list#{RouteData.Values["listId"]}";
 }
-<h1>@ViewBag.Title</h1>
 
 <div id="app"></div>
 
 @section Scripts {
 
     <partial name="_SegmentListItem"/>
-    <partial name="_SegmentCreate"/>
     <partial name="_SegmentEdit"/>
 
     <script type="text/html" id="app-template">
         <div class="row">
-            <div class="col-md-9 col-12">
-                <table class="table table-hover">
-                    <thead>
-                    <tr>
-                        <th>Start</th>
-                        <th>Length (in seconds)</th>
-                        <th>Description</th>
-                        <th>Type</th>
-                        <th>Rights</th>
-                        <th>Material</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <segment-list-item v-for="segment in segments" :key="segment.id"
+            <div class="col-md-6 col-lg-4">
+                <ul class="list-group">
+                    <segment-list-item v-for="segment in list.segments" :key="segment.id"
                                        :segment="segment"
-                                       v-on:segmentDeleted="deleteSegment($event)"
                                        v-on:segmentSelected="selectSegment($event)"
                                        :isSelected="currentSegment.id===segment.id">
                     </segment-list-item>
-                    </tbody>
-                </table>
+                </ul>
             </div>
-            <div class="col-md-3 col-12">
+            <div class="col-md-6 col-lg-8">
+                <div class="row">
+                    <div class="col-12 order-1 col-lg-6 order-lg-0" style="max-width: 25rem">
+                        <div class="row">
+                            <div class="col">
+                                <video controls class="w-100"
+                                       ref="videoplayer"
+                                       :currentTime="currentTime"
+                                       v-on:timeupdate="currentPosition = $event.target.currentTime">
+                                    <source src="https://cdn.videvo.net/videvo_files/video/free/2018-09/large_watermarked/180824_TheEarth_35_graded_preview.mp4" type="video/mp4">
+                                    Sorry, your browser doesn't support embedded videos.
+                                </video>
+                            </div>
+                        </div>
 
-                <video controls class="w-100" ref="videoplayer"
-                       :currentTime="currentTime"
-                       @@timeupdate="currentPosition = $event.target.currentTime">
-                    <source src="https://cdn.videvo.net/videvo_files/video/free/2018-09/large_watermarked/180824_TheEarth_35_graded_preview.mp4" type="video/mp4">
-                    Sorry, your browser doesn't support embedded videos.
-                </video>
-                <div class="row">
-                    <div class="col">
-                        <button @@click="selectPreviousSegment">
-                            <i class="fa-solid fa-backward-fast"></i>
-                        </button>
-                        <button @@click="$refs.videoplayer.currentTime-=1">
-                            <i class="fa-solid fa-backward"></i>
-                        </button>
-                        <button @@click="$refs.videoplayer.currentTime-=1/29.97">
-                            <i class="fa-solid fa-caret-left"></i>
-                        </button>
+                        <div class="row">
+                            <div class="col">
+                                <button v-on:click="selectPreviousSegment">
+                                    <i class="fa-solid fa-backward-fast"></i>
+                                </button>
+                                <button v-on:click="$refs.videoplayer.currentTime-=1">
+                                    <i class="fa-solid fa-backward"></i>
+                                </button>
+                                <button v-on:click="$refs.videoplayer.currentTime-=1/29.97">
+                                    <i class="fa-solid fa-caret-left"></i>
+                                </button>
+                            </div>
+                            <div class="col text-end">
+                                <button v-on:click="$refs.videoplayer.currentTime+=1/29.97">
+                                    <i class="fa-solid fa-caret-right"></i>
+                                </button>
+                                <button v-on:click="$refs.videoplayer.currentTime+=1">
+                                    <i class="fa-solid fa-forward"></i>
+                                </button>
+                                <button v-on:click="selectNextSegment">
+                                    <i class="fa-solid fa-forward-fast"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">0</div>
+                            <div class="col text-center">{{formatToTime(currentPosition)}}</div>
+                            <div class="col text-end">{{list.duration}}</div>
+                        </div>
                     </div>
-                    <div class="col text-end">
-                        <button @@click="$refs.videoplayer.currentTime+=1/29.97">
-                            <i class="fa-solid fa-caret-right"></i>
-                        </button>
-                        <button @@click="$refs.videoplayer.currentTime+=1">
-                            <i class="fa-solid fa-forward"></i>
-                        </button>
-                        <button @@click="selectNextSegment">
-                            <i class="fa-solid fa-forward-fast"></i>
-                        </button>
+                    <div class="col-12 order-0 col-lg-6 order-lg-1 border-start">
+                        <h5>{{list.broadcastTitle}}</h5>
+                        <h2>{{list.title}}</h2>
+                        <div class="mt-auto">
+                            <span class="align-self-end">
+                                <i class="fa-solid fa-calendar-day"></i> {{formatToData(list.broadcastDay)}} &nbsp;
+                                <i class="fa-solid fa-stopwatch"></i> {{list.duration}} &nbsp;
+                                <i class="fa-solid fa-coins"></i> {{list.costCenter}}
+                            </span>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col">0</div>
-                    <div class="col text-center">{{formatToTime(currentPosition)}}</div>
-                    <div class="col text-end">{{formatToTime(totalLength)}}</div>
                 </div>
                 <hr/>
                 <segment-edit v-if="currentSegment" :segment="{...currentSegment}" v-on:segmentEdited="editSegment($event)"></segment-edit>
             </div>
         </div>
-        <hr/>
-        <p>
-            <segment-create v-on:segmentCreated="createSegment($event)"></segment-create>
-        </p>
     </script>
     <script type="text/javascript">
         const url = '@Url.ActionLink("GetSegments", "Lists", new { id = RouteData.Values["listId"] })';
@@ -97,23 +97,22 @@
         const app = createApp({
             template: '#app-template',
             components: {
-                'segment-create': SegmentCreate,
                 'segment-edit': SegmentEdit,
                 'segment-list-item': SegmentListItem
             },
             computed: {
                 currentSegment() {
-                    if (!this.segments.length) return undefined;
+                    if (!this.list?.segments?.length) return undefined;
 
                     const index = this.getIndex(this.currentPosition);
-                    return this.segments[index];
+                    return this.list.segments[index];
                 }
             },
             data() {
                 return {
                     currentTime: 0, // For videoplayer only: Synchronized along currentPosition. Don't set manually!
                     currentPosition: 0,
-                    segments: [],
+                    list: {},
                     totalLength: 0
                 };
             },
@@ -122,43 +121,15 @@
                     fetch(url)
                         .then(response => response.json())
                         .then(data => {
-                            data.forEach(segment => segment.material = segment.material ?? { id: -1 });
-                            this.segments = data;
-                            const lastSegment = this.segments.at(-1);
-                            this.totalLength = getSeconds(lastSegment.start, lastSegment.length);
+                            data.segments.forEach(segment => segment.materialId = segment.materialId ?? "");
+                            this.list = data;
                         });
                 } catch (error) {
                     console.log(error);
                 }
             },
             methods: {
-                async createSegment(segment) {
-                    const response = await fetch(
-                        "/api/Segments",
-                        {
-                            method: "post",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify(segment)
-                        }
-                    );
-                    const stored = await response.json();
-                    this.segments.push(stored);
-                },
-                async deleteSegment(id) {
-                    const response = await fetch(
-                        `/api/Segments/${id}`,
-                        {
-                            method: "delete"
-                        }
-                    );
-                    if (response.status === 204) {
-                        this.segments = this.segments.filter(segment => segment.id !== id);
-                    }
-                },
                 async editSegment(segment) {
-                    segment.materialId = segment.materialId < 0 ? null : segment.materialId;
                     const response = await fetch(
                         `/api/Segments/${segment.id}`,
                         {
@@ -170,11 +141,10 @@
                         }
                     );
                     if (response.status === 200) {
-                        const old = this.segments.find(current => current.id === segment.id);
-                        const currentIndex = this.segments.indexOf(old);
+                        const old = this.list.segments.find(current => current.id === segment.id);
+                        const currentIndex = this.list.segments.indexOf(old);
                         const stored = await response.json();
-                        stored.material = stored.material ?? { id: -1 };
-                        this.segments[currentIndex] = stored;
+                        this.list.segments[currentIndex] = stored;
                     }
                 },
                 formatToTime(position) {
@@ -182,31 +152,35 @@
                     timestamp.setMilliseconds(position * 1000);
                     return `${timestamp.getHours()}:${timestamp.getMinutes()}:${timestamp.getSeconds()}.${timestamp.getMilliseconds()}`;
                 },
+                formatToData(date) {
+                    const timestamp = new Date(date);
+                    return `${timestamp.toLocaleDateString()}`;
+                },
                 selectPreviousSegment() {
                     const index = this.getIndex(this.currentPosition);
                     if (index > 0) {
                         // Change currentPosition here won't seek the videoplayer as long as it's playing. So setting it directly helps (and updates currentPosition afterwards).
-                        this.$refs.videoplayer.currentTime = getSeconds(this.segments[index - 1].start);
+                        this.$refs.videoplayer.currentTime = getSeconds(this.list.segments[index - 1].start);
                     }
                 },
                 selectNextSegment() {
                     const index = this.getIndex(this.currentPosition);
-                    if (this.segments.length > index + 1) {
+                    if (this.list.segments.length > index + 1) {
                         // Change currentPosition here won't seek the videoplayer as long as it's playing. So setting it directly helps (and updates currentPosition afterwards).
-                        this.$refs.videoplayer.currentTime = getSeconds(this.segments[index + 1].start);
+                        this.$refs.videoplayer.currentTime = getSeconds(this.list.segments[index + 1].start);
                     }
                 },
                 selectSegment(id) {
                     //console.log("Index.selectSegment", id);
-                    const segment = this.segments.find(segment => segment.id === id);
+                    const segment = this.list.segments.find(segment => segment.id === id);
                     // Change currentPosition here won't seek the videoplayer as long as it's playing. So setting it directly helps (and updates currentPosition afterwards).
                     this.$refs.videoplayer.currentTime = getSeconds(segment.start);
                 },
                 // Private methods.
                 getIndex(position) {
                     let lastIndex = 0;
-                    for (let index = 0; index < this.segments.length; index++) {
-                        const start = getSeconds(this.segments[index].start);
+                    for (let index = 0; index < this.list.segments.length; index++) {
+                        const start = getSeconds(this.list.segments[index].start);
                         if (position < start) return lastIndex;
 
                         lastIndex = index;
@@ -216,7 +190,7 @@
             },
             watch: {
                 currentPosition() {
-                    //console.log("Index.selectSegment", this.$refs["videoplayer"].paused, this.currentPosition, this.currentTime);
+                    //console.log("Index.selectSegment", this.$refs.videoplayer.paused, this.currentPosition, this.currentTime);
                     if (this.$refs.videoplayer.paused) {
                         this.currentTime = this.currentPosition;
                     }

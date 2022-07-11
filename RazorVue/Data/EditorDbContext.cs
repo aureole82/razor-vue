@@ -88,14 +88,18 @@ public class EditorDbContext : DbContext
             new()
             {
                 Id = list1Id,
-                Start = new DateTime(2022, 7, 1, 19, 14, 23),
-                Title = "Mountain Mike"
+                BroadcastDay = new DateTime(2022, 7, 1),
+                BroadcastTitle = "Local News @ 6pm",
+                Title = "Mountain Mike",
+                CostCenter = "4731"
             },
             new()
             {
                 Id = list2Id,
-                Start = new DateTime(2022, 7, 1, 19, 21, 2),
-                Title = "Medicare staff shortage"
+                BroadcastDay = new DateTime(2022, 7, 1),
+                BroadcastTitle = "Regional News @ 8pm",
+                Title = "Medicare staff shortage",
+                CostCenter = "8420"
             }
         };
         modelBuilder.Entity<EditDecisionList>().HasData(lists);
@@ -236,8 +240,17 @@ public class EditorDbContext : DbContext
                 Id = 17,
                 Description = "Latest voices about staff shortage",
                 Type = SegmentType.New,
-                Length = 60,
+                Length = 57,
                 Rights = "w/o",
+                ListId = list2Id
+            },
+            new()
+            {
+                Id = 18,
+                Description = "Overloaded board crashes down in job center",
+                Type = SegmentType.Raw,
+                Length = 3,
+                Rights = "Unknown",
                 ListId = list2Id
             }
         };
@@ -261,6 +274,9 @@ public class EditorDbContext : DbContext
                 segment.Start = current;
                 current = current.Add(TimeSpan.FromSeconds(segment.Length));
             }
+
+            var list = lists.First(list => list.Id == segmentsOfAList.Key);
+            list.Duration = current;
         }
     }
 }

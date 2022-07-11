@@ -19,11 +19,10 @@ public static class ApiModule
     private static void Map(MapperConfigurationExpression config)
     {
         config
-            .CreateMap<Segment, SegmentResponse>()
+            .CreateMap<EditDecisionList, ListResponse>()
             ;
-
         config
-            .CreateMap<Material, MaterialResponse>()
+            .CreateMap<Segment, SegmentResponse>()
             ;
 
         config

@@ -14,10 +14,16 @@
             @Html.DisplayNameFor(model => model.Lists[0].Id)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Lists[0].Start)
+            @Html.DisplayNameFor(model => model.Lists[0].BroadcastDay) / @Html.DisplayNameFor(model => model.Lists[0].Duration)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Lists[0].BroadcastTitle)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.Lists[0].Title)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Lists[0].CostCenter)
         </th>
         <th></th>
     </tr>
@@ -27,13 +33,19 @@
     {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Id)
+                @Html.DisplayFor(_ => item.Id)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Start)
+                @($"{item.BroadcastDay:d}") / @Html.DisplayFor(_ => item.Duration) 
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Title)
+                @Html.DisplayFor(_ => item.BroadcastTitle)
+            </td>
+            <td>
+                @Html.DisplayFor(_ => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(_ => item.CostCenter)
             </td>
             <td>
                 <a asp-page="/Segments/Index" asp-route-listId="@item.Id">Edit</a>
