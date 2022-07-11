@@ -171,7 +171,7 @@ public class EditorDbContext : DbContext
             new()
             {
                 Id = 10,
-                Description = "Unemployed worker",
+                Description = "Unemployment in health care",
                 Type = SegmentType.New,
                 Length = 82,
                 Rights = "w/o",
@@ -236,7 +236,7 @@ public class EditorDbContext : DbContext
                 Id = 17,
                 Description = "Latest voices about staff shortage",
                 Type = SegmentType.New,
-                Length = 77,
+                Length = 60,
                 Rights = "w/o",
                 ListId = list2Id
             }

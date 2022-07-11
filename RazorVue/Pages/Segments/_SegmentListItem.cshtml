@@ -3,10 +3,14 @@
         <td :height="minHeight" style="cursor: pointer;" v-on:click="selectSegment()">{{segment.start}}</td>
         <td>{{segment.length}}</td>
         <td>{{segment.description}}</td>
-        <td>{{segment.type}}</td>
+        <td>{{getSegmentTypeLabel(segment.type)}}</td>
         <td>{{segment.rights}}</td>
         <td>{{segment.material?.description}}</td>
-        <td> <button class="btn btn-danger" v-on:click.prevent="deleteSegment()" aria-label="Delete segment"><i class="fa-solid fa-trash"></i></button> </td>
+        <td>
+            <button class="btn btn-danger" v-on:click.prevent="deleteSegment()" aria-label="Delete segment">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        </td>
     </tr>
 </script>
 <script type="text/javascript">
@@ -27,6 +31,24 @@
             },
             deleteSegment() {
                 this.$emit("segmentDeleted", this.segment.id);
+            },
+            getSegmentTypeLabel(value) {
+                switch (value) {
+                case 0:
+                    return "New";
+                case 1:
+                    return "Archive";
+                case 2:
+                    return "Raw";
+                case 3:
+                    return "Image";
+                case 4:
+                    return "Music";
+                case 5:
+                    return "Video";
+                default:
+                    return "Unknown";
+                }
             }
         }
     };

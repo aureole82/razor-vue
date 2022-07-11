@@ -40,15 +40,41 @@
                 </table>
             </div>
             <div class="col-md-3 col-12">
-                <input type="range" class="w-100"
-                       min="0"
-                       :max="totalLength"
-                       :value="currentPosition"
-                       @@input="currentPositionChanged($event.target.value)">
+
+                <video controls class="w-100" ref="videoplayer"
+                       :currentTime="currentTime"
+                       @@timeupdate="currentPosition = $event.target.currentTime">
+                    <source src="https://cdn.videvo.net/videvo_files/video/free/2018-09/large_watermarked/180824_TheEarth_35_graded_preview.mp4" type="video/mp4">
+                    Sorry, your browser doesn't support embedded videos.
+                </video>
+                <div class="row">
+                    <div class="col">
+                        <button @@click="selectPreviousSegment">
+                            <i class="fa-solid fa-backward-fast"></i>
+                        </button>
+                        <button @@click="$refs.videoplayer.currentTime-=1">
+                            <i class="fa-solid fa-backward"></i>
+                        </button>
+                        <button @@click="$refs.videoplayer.currentTime-=1/29.97">
+                            <i class="fa-solid fa-caret-left"></i>
+                        </button>
+                    </div>
+                    <div class="col text-end">
+                        <button @@click="$refs.videoplayer.currentTime+=1/29.97">
+                            <i class="fa-solid fa-caret-right"></i>
+                        </button>
+                        <button @@click="$refs.videoplayer.currentTime+=1">
+                            <i class="fa-solid fa-forward"></i>
+                        </button>
+                        <button @@click="selectNextSegment">
+                            <i class="fa-solid fa-forward-fast"></i>
+                        </button>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col">0</div>
-                    <div class="col text-center">{{currentPosition}}</div>
-                    <div class="col text-end">{{totalLength}}</div>
+                    <div class="col text-center">{{formatToTime(currentPosition)}}</div>
+                    <div class="col text-end">{{formatToTime(totalLength)}}</div>
                 </div>
                 <hr/>
                 <segment-edit v-if="currentSegment" :segment="{...currentSegment}" v-on:segmentEdited="editSegment($event)"></segment-edit>
@@ -79,12 +105,13 @@
                 currentSegment() {
                     if (!this.segments.length) return undefined;
 
-                    return this.segments[this.currentIndex];
+                    const index = this.getIndex(this.currentPosition);
+                    return this.segments[index];
                 }
             },
             data() {
                 return {
-                    currentIndex: 0,
+                    currentTime: 0, // For videoplayer only: Synchronized along currentPosition. Don't set manually!
                     currentPosition: 0,
                     segments: [],
                     totalLength: 0
@@ -105,21 +132,6 @@
                 }
             },
             methods: {
-                currentPositionChanged(position) {
-                    this.currentPosition = position;
-                    //return;
-                    let lastIndex = 0;
-                    for (let index = 0; index < this.segments.length; index++) {
-                        const start = getSeconds(this.segments[index].start);
-                        if (position < start) break;
-
-                        lastIndex = index;
-                    }
-                    console.log("currentPositionChanged()", position, lastIndex);
-                    if (this.currentIndex === lastIndex) return;
-
-                    this.currentIndex = lastIndex;
-                },
                 async createSegment(segment) {
                     const response = await fetch(
                         "/api/Segments",
@@ -133,6 +145,17 @@
                     );
                     const stored = await response.json();
                     this.segments.push(stored);
+                },
+                async deleteSegment(id) {
+                    const response = await fetch(
+                        `/api/Segments/${id}`,
+                        {
+                            method: "delete"
+                        }
+                    );
+                    if (response.status === 204) {
+                        this.segments = this.segments.filter(segment => segment.id !== id);
+                    }
                 },
                 async editSegment(segment) {
                     segment.materialId = segment.materialId < 0 ? null : segment.materialId;
@@ -154,20 +177,48 @@
                         this.segments[currentIndex] = stored;
                     }
                 },
-                selectSegment(id) {
-                    const segment = this.segments.find(segment => segment.id === id);
-                    this.currentIndex = this.segments.indexOf(segment);
-                    this.currentPosition = getSeconds(segment.start);
+                formatToTime(position) {
+                    const timestamp = new Date(`1970-01-01T00:00:00`);
+                    timestamp.setMilliseconds(position * 1000);
+                    return `${timestamp.getHours()}:${timestamp.getMinutes()}:${timestamp.getSeconds()}.${timestamp.getMilliseconds()}`;
                 },
-                async deleteSegment(id) {
-                    const response = await fetch(
-                        `/api/Segments/${id}`,
-                        {
-                            method: "delete"
-                        }
-                    );
-                    if (response.status === 204) {
-                        this.segments = this.segments.filter(segment => segment.id !== id);
+                selectPreviousSegment() {
+                    const index = this.getIndex(this.currentPosition);
+                    if (index > 0) {
+                        // Change currentPosition here won't seek the videoplayer as long as it's playing. So setting it directly helps (and updates currentPosition afterwards).
+                        this.$refs.videoplayer.currentTime = getSeconds(this.segments[index - 1].start);
+                    }
+                },
+                selectNextSegment() {
+                    const index = this.getIndex(this.currentPosition);
+                    if (this.segments.length > index + 1) {
+                        // Change currentPosition here won't seek the videoplayer as long as it's playing. So setting it directly helps (and updates currentPosition afterwards).
+                        this.$refs.videoplayer.currentTime = getSeconds(this.segments[index + 1].start);
+                    }
+                },
+                selectSegment(id) {
+                    //console.log("Index.selectSegment", id);
+                    const segment = this.segments.find(segment => segment.id === id);
+                    // Change currentPosition here won't seek the videoplayer as long as it's playing. So setting it directly helps (and updates currentPosition afterwards).
+                    this.$refs.videoplayer.currentTime = getSeconds(segment.start);
+                },
+                // Private methods.
+                getIndex(position) {
+                    let lastIndex = 0;
+                    for (let index = 0; index < this.segments.length; index++) {
+                        const start = getSeconds(this.segments[index].start);
+                        if (position < start) return lastIndex;
+
+                        lastIndex = index;
+                    }
+                    return lastIndex;
+                }
+            },
+            watch: {
+                currentPosition() {
+                    //console.log("Index.selectSegment", this.$refs["videoplayer"].paused, this.currentPosition, this.currentTime);
+                    if (this.$refs.videoplayer.paused) {
+                        this.currentTime = this.currentPosition;
                     }
                 }
             }
