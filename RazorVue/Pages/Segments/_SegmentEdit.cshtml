@@ -13,17 +13,29 @@
             <span class="text-danger field-validation-valid" data-valmsg-for="Segment.Length" data-valmsg-replace="true"></span>
         </div>
         <div class="form-group">
-            <label class="control-label" for="Segment_Description">Description</label>
-            <textarea v-model="segment.description" class="form-control" type="text" data-val="true" data-val-required="The Description field is required." id="Segment_Description" name="Segment.Description"></textarea>
-            <span class="text-danger field-validation-valid" data-valmsg-for="Segment.Description" data-valmsg-replace="true"></span>
-        </div>
-        <div class="form-group">
             <label class="control-label" for="Segment_Type">Type</label>
             <select class="form-control" data-val="true" data-val-required="The Type field is required." id="Segment_Type" name="Segment.Type"
                     v-model="segment.type" v-on:change="editSegment()"
                     asp-items="Html.GetEnumSelectList<SegmentType>()">
             </select>
             <span class="text-danger field-validation-valid" data-valmsg-for="Segment.Type" data-valmsg-replace="true"></span>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="Segment_Description">Description</label>
+            <textarea v-model="segment.description" class="form-control" type="text" data-val="true" data-val-required="The Description field is required." id="Segment_Description" name="Segment.Description"></textarea>
+            <span class="text-danger field-validation-valid" data-valmsg-for="Segment.Description" data-valmsg-replace="true"></span>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="Segment_Origin">Origin</label>
+            <textarea v-model="segment.origin" class="form-control" type="text" id="Segment_Origin" name="Segment.Origin"></textarea>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="Segment_OriginBroadcastDay">Origin broadcast at</label>
+            <input v-model="segment.originBroadcastDay" class="form-control" type="date" id="Segment_OriginBroadcastDay" name="Segment.OriginBroadcastDay"></input>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="Segment_OriginDescription">Origin description</label>
+            <input v-model="segment.originDescription" class="form-control" type="text" id="Segment_OriginDescription" name="Segment.OriginDescription"></input>
         </div>
         <div class="form-group">
             <label class="control-label" for="Segment_Rights">Rights</label>
@@ -65,11 +77,7 @@
                 this.$emit(
                     "segmentEdited",
                     {
-                        id: this.segment.id,
-                        start: this.segment.start,
-                        length: this.segment.length,
-                        description: this.segment.description,
-                        rights: this.segment.rights,
+                        ...this.segment,
                         type: +this.segment.type,
                         materialId: this.segment.materialId ? this.segment.materialId : null
                     }

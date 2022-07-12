@@ -113,6 +113,8 @@ public class EditorDbContext : DbContext
                 Description = "Mountain Mike tells about the beginning",
                 Type = SegmentType.Archive,
                 Length = 12,
+                OriginDescription = "CBC",
+                OriginBroadcastDay = new DateTime(2021, 2, 5),
                 Rights = "w/o",
                 ListId = list1Id
             },
@@ -122,6 +124,8 @@ public class EditorDbContext : DbContext
                 Description = "Mountain Mike tells about the beginning",
                 Type = SegmentType.New,
                 Length = 24,
+                Origin = "",
+                OriginDescription = "CBC",
                 Rights = "w/o",
                 ListId = list1Id
             },
@@ -131,6 +135,7 @@ public class EditorDbContext : DbContext
                 Description = "Everybody loves hiking",
                 Type = SegmentType.Archive,
                 Length = 18,
+                OriginBroadcastDay = new DateTime(2021, 2, 5),
                 Rights = "Property of the content group, usage allowed",
                 ListId = list1Id
             },
@@ -149,6 +154,8 @@ public class EditorDbContext : DbContext
                 Description = "Local mountain tours",
                 Type = SegmentType.Archive,
                 Length = 18,
+                OriginDescription = "CBC",
+                OriginBroadcastDay = new DateTime(2021, 2, 5),
                 Rights = "Property of the local hiking club, usage allowed",
                 ListId = list1Id
             },
@@ -159,6 +166,8 @@ public class EditorDbContext : DbContext
                 Type = SegmentType.Image,
                 Start = TimeSpan.FromSeconds(12 + 24 + 18 + 6 + 3),
                 Length = 12,
+                OriginDescription = "LoMoTo",
+                OriginBroadcastDay = new DateTime(1993, 12, 15),
                 Rights = "Property of the local hiking club, usage allowed only for current broadcast",
                 ListId = list1Id
             },
@@ -168,6 +177,7 @@ public class EditorDbContext : DbContext
                 Description = "Time to say goodbye",
                 Type = SegmentType.New,
                 Length = 6,
+                OriginDescription = "CBC",
                 Rights = "w/o",
                 ListId = list1Id
             },
@@ -178,6 +188,7 @@ public class EditorDbContext : DbContext
                 Description = "Unemployment in health care",
                 Type = SegmentType.New,
                 Length = 82,
+                OriginDescription = "CBC",
                 Rights = "w/o",
                 ListId = list2Id
             },
@@ -187,6 +198,8 @@ public class EditorDbContext : DbContext
                 Description = "Nurse in working clothes",
                 Type = SegmentType.Archive,
                 Length = 8,
+                OriginDescription = "CBC",
+                OriginBroadcastDay = new DateTime(2020, 2, 28),
                 Rights = "w/o",
                 ListId = list2Id
             },
@@ -196,6 +209,8 @@ public class EditorDbContext : DbContext
                 Description = "Nurse with patient",
                 Type = SegmentType.Image,
                 Length = 10,
+                OriginDescription = "CBC",
+                OriginBroadcastDay = new DateTime(2020, 2, 28),
                 Rights = "Personal rights of patient",
                 ListId = list2Id
             },
@@ -223,6 +238,8 @@ public class EditorDbContext : DbContext
                 Description = "Union's march",
                 Type = SegmentType.Archive,
                 Length = 39,
+                OriginDescription = "CBC",
+                OriginBroadcastDay = new DateTime(2020, 2, 28),
                 Rights = "w/o",
                 ListId = list2Id
             },
@@ -232,6 +249,7 @@ public class EditorDbContext : DbContext
                 Description = "Transition",
                 Type = SegmentType.New,
                 Length = 1,
+                OriginDescription = "CBC",
                 Rights = "w/o",
                 ListId = list2Id
             },
@@ -241,6 +259,7 @@ public class EditorDbContext : DbContext
                 Description = "Latest voices about staff shortage",
                 Type = SegmentType.New,
                 Length = 57,
+                OriginDescription = "CBC",
                 Rights = "w/o",
                 ListId = list2Id
             },
@@ -273,6 +292,14 @@ public class EditorDbContext : DbContext
             {
                 segment.Start = current;
                 current = current.Add(TimeSpan.FromSeconds(segment.Length));
+            }
+
+            foreach (var segment in segmentsOfAList
+                         .Where(segment => segment.Origin == default && segment.OriginBroadcastDay.HasValue))
+            {
+                segment.Origin = @$"Story: {segment.Description} | 
+Program: {(segment.OriginBroadcastDay.Value.Year < 2021 ? "HilariousTV" : "Gossip @ 4pm")} | 
+{segment.OriginBroadcastDay:d}";
             }
 
             var list = lists.First(list => list.Id == segmentsOfAList.Key);

@@ -9,17 +9,17 @@
 
 @section Scripts {
 
-    <partial name="_SegmentListItem"/>
-    <partial name="_SegmentEdit"/>
+    <partial name="_SegmentListItem" />
+    <partial name="_SegmentEdit" />
 
     <script type="text/html" id="app-template">
         <div class="row">
             <div class="col-md-6 col-lg-4">
                 <ul class="list-group">
                     <segment-list-item v-for="segment in list.segments" :key="segment.id"
-                                       :segment="segment"
-                                       v-on:segmentSelected="selectSegment($event)"
-                                       :isSelected="currentSegment.id===segment.id">
+                                   :segment="segment"
+                                   v-on:segmentSelected="selectSegment($event)"
+                                   :isSelected="currentSegment.id===segment.id">
                     </segment-list-item>
                 </ul>
             </div>
@@ -29,9 +29,9 @@
                         <div class="row">
                             <div class="col">
                                 <video controls class="w-100"
-                                       ref="videoplayer"
-                                       :currentTime="currentTime"
-                                       v-on:timeupdate="currentPosition = $event.target.currentTime">
+                                   ref="videoplayer"
+                                   :currentTime="currentTime"
+                                   v-on:timeupdate="currentPosition = $event.target.currentTime">
                                     <source src="https://cdn.videvo.net/videvo_files/video/free/2018-09/large_watermarked/180824_TheEarth_35_graded_preview.mp4" type="video/mp4">
                                     Sorry, your browser doesn't support embedded videos.
                                 </video>
@@ -93,6 +93,11 @@
             const timestamp = new Date(`1970-01-01T${start}`);
             return (timestamp.getHours() * 60 + timestamp.getMinutes()) * 60 + timestamp.getSeconds() + (length ?? 0);
         }
+        function normalizeSegment(segment) {
+            segment.materialId = segment.materialId ?? "";
+            segment.originBroadcastDay = segment.originBroadcastDay ? segment.originBroadcastDay.split("T")[0] : null;
+            return segment;
+        }
 
         const app = createApp({
             template: '#app-template',
@@ -121,7 +126,7 @@
                     fetch(url)
                         .then(response => response.json())
                         .then(data => {
-                            data.segments.forEach(segment => segment.materialId = segment.materialId ?? "");
+                            data.segments.forEach(normalizeSegment);
                             this.list = data;
                         });
                 } catch (error) {
@@ -144,7 +149,7 @@
                         const old = this.list.segments.find(current => current.id === segment.id);
                         const currentIndex = this.list.segments.indexOf(old);
                         const stored = await response.json();
-                        this.list.segments[currentIndex] = stored;
+                        this.list.segments[currentIndex] = normalizeSegment(stored);
                     }
                 },
                 formatToTime(position) {
@@ -205,4 +210,4 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-}
+    }

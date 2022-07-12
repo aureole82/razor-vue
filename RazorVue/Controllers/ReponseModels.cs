@@ -8,7 +8,7 @@ public class ListResponse
 {
     public int Id { get; set; }
     public string BroadcastTitle { get; set; }
-    public DateTime BroadcastDay { get; set; }
+    public DateTime? BroadcastDay { get; set; }
     public string Title { get; set; }
     public TimeSpan Duration { get; set; }
     public string CostCenter { get; set; }
@@ -23,6 +23,9 @@ public class SegmentResponse
     public int Length { get; set; }
     public string Description { get; set; }
     public SegmentType Type { get; set; }
+    public string Origin { get; set; }
+    public DateTime OriginBroadcastDay { get; set; }
+    public string OriginDescription { get; set; }
     public string Rights { get; set; }
 
     public int? MaterialId { get; set; }

@@ -8,9 +8,11 @@ public class Segment
     public int Id { get; set; }
     public TimeSpan Start { get; set; }
     public int Length { get; set; }
-
     [Required] public string Description { get; set; }
     public SegmentType Type { get; set; }
+    public string Origin { get; set; }
+    public DateTime? OriginBroadcastDay { get; set; }
+    public string OriginDescription { get; set; }
     public string Rights { get; set; }
 
     public int? MaterialId { get; set; }
