@@ -62,18 +62,13 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col">0</div>
-                            <div class="col text-center">{{formatToTime(currentPosition)}}</div>
-                            <div class="col text-end">{{list.duration}}</div>
-                        </div>
                     </div>
                     <div class="col-12 order-0 col-lg-6 order-lg-1 border-start">
                         <h5>{{list.broadcastTitle}}</h5>
                         <h2>{{list.title}}</h2>
                         <div class="mt-auto">
                             <span class="align-self-end">
-                                <i class="fa-solid fa-calendar-day"></i> {{formatToData(list.broadcastDay)}} &nbsp;
+                                <i class="fa-solid fa-calendar-day"></i> {{dateToString(list.broadcastDay)}} &nbsp;
                                 <i class="fa-solid fa-stopwatch"></i> {{list.duration}} &nbsp;
                                 <i class="fa-solid fa-coins"></i> {{list.costCenter}}
                             </span>
@@ -152,12 +147,7 @@
                         this.list.segments[currentIndex] = normalizeSegment(stored);
                     }
                 },
-                formatToTime(position) {
-                    const timestamp = new Date(`1970-01-01T00:00:00`);
-                    timestamp.setMilliseconds(position * 1000);
-                    return `${timestamp.getHours()}:${timestamp.getMinutes()}:${timestamp.getSeconds()}.${timestamp.getMilliseconds()}`;
-                },
-                formatToData(date) {
+                dateToString(date) {
                     const timestamp = new Date(date);
                     return `${timestamp.toLocaleDateString()}`;
                 },
